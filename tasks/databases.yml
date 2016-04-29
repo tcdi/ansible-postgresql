@@ -37,8 +37,9 @@
   shell: "{{ postgresql_bin_directory}}/psql {{item.name}} --username {{postgresql_admin_user}} -c 'CREATE EXTENSION IF NOT EXISTS hstore;'"
   with_items: postgresql_databases
   register: hstore_ext_result
-  failed_when: hstore_ext_result.rc != 0 and ("already exists, skipping" not in hstore_ext_result.stderr)
-  changed_when: hstore_ext_result.rc == 0 and ("already exists, skipping" not in hstore_ext_result.stderr)
+  # https://github.com/ANXS/postgresql/issues/169
+  failed_when: hstore_ext_result.rc != 0 and ("already exists" not in hstore_ext_result.stderr)
+  changed_when: hstore_ext_result.rc == 0 and ("already exist" not in hstore_ext_result.stderr)
   when: item.hstore is defined and item.hstore
 
 - name: PostgreSQL | Add uuid-ossp to the database with the requirement
@@ -47,8 +48,8 @@
   shell: "{{ postgresql_bin_directory}}/psql {{item.name}} --username {{postgresql_admin_user}} -c 'CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";'"
   with_items: postgresql_databases
   register: uuid_ext_result
-  failed_when: uuid_ext_result.rc != 0 and ("already exists, skipping" not in uuid_ext_result.stderr)
-  changed_when: uuid_ext_result.rc == 0 and ("already exists, skipping" not in uuid_ext_result.stderr)
+  failed_when: uuid_ext_result.rc != 0 and ("already exists" not in uuid_ext_result.stderr)
+  changed_when: uuid_ext_result.rc == 0 and ("already exists" not in uuid_ext_result.stderr)
   when: item.uuid_ossp is defined and item.uuid_ossp
 
 - name: PostgreSQL | Add postgis to the databases with the requirement
@@ -85,6 +86,6 @@
   shell: "{{ postgresql_bin_directory}}/psql {{item.name}} --username {{postgresql_admin_user}} -c 'CREATE EXTENSION IF NOT EXISTS citext;'"
   with_items: postgresql_databases
   register: citext_ext_result
-  failed_when: citext_ext_result.rc != 0 and ("already exists, skipping" not in citext_ext_result.stderr)
-  changed_when: citext_ext_result.rc == 0 and ("already exists, skipping" not in citext_ext_result.stderr)
+  failed_when: citext_ext_result.rc != 0 and ("already exists" not in citext_ext_result.stderr)
+  changed_when: citext_ext_result.rc == 0 and ("already exist" not in citext_ext_result.stderr)
   when: item.citext is defined and item.citext
