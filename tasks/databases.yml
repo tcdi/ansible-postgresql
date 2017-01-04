@@ -20,6 +20,12 @@
   become_user: "{{postgresql_admin_user}}"
   with_items: "{{postgresql_databases}}"
   when: postgresql_databases|length > 0
+  register: pgdb_ext_result
+  failed_when: '"failed" in pgdb_ext_result and pgdb_ext_result.failed == true and not
+               ("Changing LC_COLLATE is not supported" in pgdb_ext_result.msg and
+                postgres_ignore_collate_mismatch) and not
+               ("Changing LC_CTYPE is not supported" in pgdb_ext_result.msg and
+                postgres_ignore_ctype_mismatch)'
 
 - name: PostgreSQL | Add extensions to the databases
   shell: "psql {{item.0.db}} --username {{postgresql_admin_user}} -c 'CREATE EXTENSION IF NOT EXISTS {{ item.1 }};'"
