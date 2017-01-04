@@ -11,6 +11,12 @@ postgresql_ctype_parts:
   - 'en_US' # Locale
   - 'UTF-8' # Encoding
 postgresql_ctype: "{{ postgresql_ctype_parts | join('.') }}"
+postgres_ignore_ctype_mismatch: false
+postgresql_collate_parts:
+  - 'en_US' # Locale
+  - 'UTF-8' # Encoding
+postgresql_collate: "{{ postgresql_ctype_parts | join('.') }}"
+postgres_ignore_collate_mismatch: false
 
 postgresql_admin_user: "postgres"
 postgresql_default_auth_method: "trust"
