@@ -39,13 +39,12 @@
     name: "{{item}}"
     state: present
     update_cache: yes
-    default_release: "{{ansible_distribution_release}}-pgdg"
     cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
   environment: "{{postgresql_env}}"
   with_items:
-    - "postgresql-{{postgresql_version}}"
-    - "postgresql-client-{{postgresql_version}}"
-    - "postgresql-contrib-{{postgresql_version}}"
+    - "postgresql-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
+    - "postgresql-client-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
+    - "postgresql-contrib-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
 
 - name: PostgreSQL | PGTune
   apt:
