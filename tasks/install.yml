@@ -34,6 +34,11 @@
     cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
   with_items: ["python-psycopg2", "python-pycurl", "locales"]
 
+- name: PostgreSQL | Test for PostgreSQL binary
+  stat:
+    path: /usr/bin/psql
+  register: postgres_binary
+
 - name: PostgreSQL | Install PostgreSQL
   apt:
     name: "{{item}}"
@@ -45,6 +50,7 @@
     - "postgresql-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
     - "postgresql-client-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
     - "postgresql-contrib-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
+  when: postgres_binary.stat.exists == false
 
 - name: PostgreSQL | PGTune
   apt:
