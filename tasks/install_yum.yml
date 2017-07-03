@@ -7,10 +7,20 @@
     name: ca-certificates
     state: present
 
-- name: PostgreSQL | Add PostgreSQL repository
+- name: PostgreSQL | Add PostgreSQL repository with proxy
   yum:
     name: "{{ postgresql_yum_repository_url }}"
     state: present
+  environment:
+    http_proxy: "{{ postgresql_yum_proxy }}"
+    https_proxy: "{{ postgresql_yum_proxy }}"
+  when: "{{ postgresql_yum_proxy is not none }}"
+
+- name: PostgreSQL | Add PostgreSQL repository without proxy
+  yum:
+    name: "{{ postgresql_yum_repository_url }}"
+    state: present
+  when: "{{ postgresql_yum_proxy is not defined or postgresql_yum_proxy is none }}"
 
 - name: PostgreSQL | Make sure the dependencies are installed
   yum:

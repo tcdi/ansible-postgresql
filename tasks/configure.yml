@@ -1,12 +1,5 @@
 # file: postgresql/tasks/configure.yml
 
-- name: PostgreSQL | Drop the data directory | RedHat
-  file:
-    path: "{{ postgresql_data_directory }}"
-    state: absent
-  register: pgdata_dir_remove
-  when: ansible_os_family == "RedHat" and postgresql_cluster_reset
-
 - name: PostgreSQL | Make sure the postgres data directory exists
   file:
     path: "{{postgresql_data_directory}}"
@@ -33,6 +26,13 @@
     - { parts: "{{ postgresql_locale_parts }}", locale_name: "{{ postgresql_locale }}" }
     - { parts: "{{ postgresql_ctype_parts }}", locale_name: "{{ postgresql_ctype }}" }
   when: ansible_os_family == "RedHat"
+
+- name: PostgreSQL | Drop the data directory | RedHat
+  file:
+    path: "{{ postgresql_data_directory }}"
+    state: absent
+  register: pgdata_dir_remove
+  when: ansible_os_family == "RedHat" and postgresql_cluster_reset and pgdata_dir_exist.changed
 
 - name: PostgreSQL | Reset the cluster - drop the existing one | Debian
   shell: pg_dropcluster --stop {{ postgresql_version }} {{ postgresql_cluster_name }}
@@ -65,6 +65,16 @@
   become_user: "{{ postgresql_service_user }}"
   when: ansible_os_family == "RedHat" and postgresql_cluster_reset and
         (pgdata_dir_exist.changed or not pgdata_dir_initialized.stat.exists)
+
+- name: PostgreSQL | Move configuration files | RedHat
+  command: mv {{ postgresql_data_directory }}/{{ item }} {{ postgresql_conf_directory }}/{{ item }}
+  become: yes
+  become_user: "{{ postgresql_service_user }}"
+  when: ansible_os_family == "RedHat" and postgresql_cluster_reset and
+        (pgdata_dir_exist.changed or not pgdata_dir_initialized.stat.exists)
+  with_items:
+    - pg_ident.conf
+    - pg_hba.conf
 
 - name: PostgreSQL | Ensure configuration directory exists
   file:
