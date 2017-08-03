@@ -34,6 +34,15 @@
   register: pgdata_dir_remove
   when: ansible_os_family == "RedHat" and postgresql_cluster_reset and pgdata_dir_exist.changed
 
+- name: PostgreSQL | Recreate the postgres data directory
+  file:
+    path: "{{postgresql_data_directory}}"
+    owner: "{{ postgresql_service_user }}"
+    group: "{{ postgresql_service_group }}"
+    state: directory
+    mode: 0700
+  when: ansible_os_family == "RedHat" and postgresql_cluster_reset and pgdata_dir_exist.changed
+
 - name: PostgreSQL | Reset the cluster - drop the existing one | Debian
   shell: pg_dropcluster --stop {{ postgresql_version }} {{ postgresql_cluster_name }}
   become: yes
@@ -66,6 +75,14 @@
   when: ansible_os_family == "RedHat" and postgresql_cluster_reset and
         (pgdata_dir_exist.changed or not pgdata_dir_initialized.stat.exists)
 
+- name: PostgreSQL | Ensure configuration directory exists
+  file:
+    path: "{{ postgresql_conf_directory }}"
+    owner: "{{ postgresql_service_user }}"
+    group: "{{ postgresql_service_group }}"
+    mode: 0750
+    state: directory
+
 - name: PostgreSQL | Move configuration files | RedHat
   command: mv {{ postgresql_data_directory }}/{{ item }} {{ postgresql_conf_directory }}/{{ item }}
   become: yes
@@ -75,14 +92,6 @@
   with_items:
     - pg_ident.conf
     - pg_hba.conf
-
-- name: PostgreSQL | Ensure configuration directory exists
-  file:
-    path: "{{ postgresql_conf_directory }}"
-    owner: "{{ postgresql_service_user }}"
-    group: "{{ postgresql_service_group }}"
-    mode: 0750
-    state: directory
 
 - name: PostgreSQL | Update configuration - pt. 1 (pg_hba.conf)
   template:
@@ -154,6 +163,15 @@
     dest: "/etc/systemd/system/postgresql-{{ postgresql_version }}.service.d/custom.conf"
   when: ansible_os_family == "RedHat"
   register: postgresql_systemd_custom_conf
+
+- name: PostgreSQL | Ensure the log directory for PostgreSQL exists | RedHat
+  file:
+    name: "/var/log/postgresql"
+    state: directory
+    owner: "{{ postgresql_service_user }}"
+    group: "{{ postgresql_service_group }}"
+    mode: 0755
+  when: ansible_os_family == "RedHat"
 
 - name: PostgreSQL | Ensure the pid directory for PostgreSQL exists
   file:
