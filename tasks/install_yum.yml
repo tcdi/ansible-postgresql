@@ -7,20 +7,48 @@
     name: ca-certificates
     state: present
 
-- name: PostgreSQL | Add PostgreSQL repository with proxy
-  yum:
-    name: "{{ postgresql_yum_repository_url }}"
-    state: present
-  environment:
-    http_proxy: "{{ postgresql_yum_proxy }}"
-    https_proxy: "{{ postgresql_yum_proxy }}"
-  when: "{{ postgresql_yum_proxy is not none }}"
+- name: "Create temp directory"
+  become: false
+  connection: local
+  file:
+    path: ".tmp/{{inventory_hostname}}"
+    state: directory
 
-- name: PostgreSQL | Add PostgreSQL repository without proxy
+- name: PostgreSQL | Download repository RPM
+  connection: local
+  become: false
+  get_url:
+    dest: ".tmp/{{inventory_hostname}}/postgres_{{ postgresql_version_terse }}_repository.rpm"
+    url: "{{ postgresql_yum_repository_url }}"
+  changed_when: false
+  run_once: true
+
+- name: PostgreSQL | Copy repository RPM to server
+  copy: 
+    src: ".tmp/{{inventory_hostname}}/postgres_{{ postgresql_version_terse }}_repository.rpm"
+    dest: "/tmp//postgres_{{ postgresql_version_terse }}_repository.rpm"
+
+- name: PostgreSQL | Add PostgreSQL repository
   yum:
-    name: "{{ postgresql_yum_repository_url }}"
+    name: "/tmp/postgres_{{ postgresql_version_terse }}_repository.rpm"
     state: present
-  when: "{{ postgresql_yum_proxy is not defined or postgresql_yum_proxy is none }}"
+
+- name: PostgreSQL | Switch to http
+  replace:
+    dest: "/etc/yum.repos.d/pgdg-{{ postgresql_version_terse }}-redhat.repo"
+    regexp: "https"
+    replace: "http"
+  when: "http_proxy is not none"
+
+- name: PostgreSQL | Add proxy to repo
+  lineinfile:
+    dest: "/etc/yum.repos.d/pgdg-{{ postgresql_version_terse }}-redhat.repo"
+    insertafter: "^{{ item | regex_escape() }}"
+    line: "proxy={{ http_proxy }} #{{ item }}"
+  with_items:
+    - "[pgdg{{ postgresql_version_terse }}]"
+    - "[pgdg{{ postgresql_version_terse }}-source]"
+  when: "http_proxy is not none"
 
 - name: PostgreSQL | Make sure the dependencies are installed
   yum:
