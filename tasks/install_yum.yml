@@ -21,7 +21,6 @@
     dest: ".tmp/{{inventory_hostname}}/postgres_{{ postgresql_version_terse }}_repository.rpm"
     url: "{{ postgresql_yum_repository_url }}"
   changed_when: false
-  run_once: true
 
 - name: PostgreSQL | Copy repository RPM to server
   copy: 
