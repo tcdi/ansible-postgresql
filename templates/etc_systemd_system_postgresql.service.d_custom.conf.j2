@@ -4,7 +4,7 @@
 [Service]
 User={{ postgresql_service_user }}
 Group={{ postgresql_service_group }}
-
+LimitNOFILE=100000
 Environment=PGDATA={{ postgresql_conf_directory }}
 
 ExecStartPre=
