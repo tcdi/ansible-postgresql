@@ -7,8 +7,4 @@ Icon
 .Trashes
 .vagrant
 test
-.idea
-*.iml
-*.iws
-*.ipr
 *.retry
