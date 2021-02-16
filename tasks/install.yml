@@ -28,11 +28,18 @@
 
 - name: PostgreSQL | Make sure the dependencies are installed
   apt:
+    pkg: "python{{'3' if ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('20.04', '>=') else ''}}-psycopg2"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
+
+- name: PostgreSQL | Make sure the dependencies are installed
+  apt:
     pkg: "{{item}}"
     state: present
     update_cache: yes
     cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
-  with_items: ["python-psycopg2", "python-pycurl", "locales"]
+  with_items: ["python-pycurl", "locales"]
 
 - name: PostgreSQL | Test for PostgreSQL binary
   stat:
