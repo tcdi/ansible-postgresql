@@ -6,7 +6,7 @@
     state: started
 
 - name: PostgreSQL | Make sure the PostgreSQL users are present
-  # no_log: true
+  no_log: true
   postgresql_user:
     name: "{{item.name}}"
     password: "{{ item.pass | default(omit) }}"
