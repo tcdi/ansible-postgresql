@@ -24,22 +24,14 @@
   template:
     src: etc_apt_preferences.d_apt_postgresql_org_pub_repos_apt.pref.j2
     dest: /etc/apt/preferences.d/apt_postgresql_org_pub_repos_apt.pref
-  when: postgresql_apt_pin_priority
+  when: postgresql_apt_pin_priority|bool|default(false)
 
 - name: PostgreSQL | Make sure the dependencies are installed
   apt:
-    pkg: "python{{'3' if ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('20.04', '>=') else ''}}-psycopg2"
+    pkg: "{{ postgresql_apt_dependencies }}"
     state: present
     update_cache: yes
     cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
-
-- name: PostgreSQL | Make sure the dependencies are installed
-  apt:
-    pkg: "{{item}}"
-    state: present
-    update_cache: yes
-    cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
-  with_items: ["python-pycurl", "locales"]
 
 - name: PostgreSQL | Test for PostgreSQL binary
   stat:
@@ -48,15 +40,14 @@
 
 - name: PostgreSQL | Install PostgreSQL
   apt:
-    name: "{{item}}"
+    name:
+      - "postgresql-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
+      - "postgresql-client-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
+      - "postgresql-contrib-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
     state: present
     update_cache: yes
     cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
   environment: "{{postgresql_env}}"
-  with_items:
-    - "postgresql-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
-    - "postgresql-client-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
-    - "postgresql-contrib-{{postgresql_version}}{%if postgresql_patch_version%}={{postgresql_patch_version}}{%endif%}"
   when: postgres_binary.stat.exists == false
 
 - name: PostgreSQL | PGTune
