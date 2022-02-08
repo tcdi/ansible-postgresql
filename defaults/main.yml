@@ -158,7 +158,7 @@ postgresql_client_connection_check_interval: 0                      # (>= 14) - 
 
 postgresql_shared_buffers:       128MB # min 128kB
 postgresql_huge_pages:           try   # on, off, or try
-postgresql_huge_page_size:       0  # on, off, or try               # (>= 14)
+postgresql_huge_page_size:       0  # zero for system default       # (>= 14)
 postgresql_temp_buffers:         8MB   # min 800kB
 
 # Caution: it is not advisable to set max_prepared_transactions nonzero unless
@@ -271,7 +271,7 @@ postgresql_commit_siblings:        5      # range 1-1000
 
 # - Checkpoints -
 
-postgresql_checkpoint_segments:          3     # (<= 9.4) in logfile segments, min 1, 16MB each   "missing in pg12 an pg14"
+postgresql_checkpoint_segments:          3     # (<= 9.4) in logfile segments, min 1, 16MB each 
 postgresql_max_wal_size:                 1GB   # (>= 9.5)
 postgresql_min_wal_size:                 80MB  # (>= 9.5)
 postgresql_checkpoint_flush_after:       0     # (>= 9.6) 0 disables,
@@ -355,8 +355,8 @@ postgresql_hot_standby: off
 postgresql_max_standby_archive_delay: 30s # -1 allows indefinite delay
 # max delay before canceling queries when reading streaming WAL;
 postgresql_max_standby_streaming_delay: 30s # -1 allows indefinite delay
-# create temp slot if primary_slot_name
-postgresql_wal_receiver_create_temp_slot: off    # is not set  (>= 14)
+# create temp slot if primary_slot_name is not set
+postgresql_wal_receiver_create_temp_slot: off      (>= 14)
 # send replies at least this often
 postgresql_wal_receiver_status_interval: 10s # 0 disables
 # send info from standby to prevent query conflicts
