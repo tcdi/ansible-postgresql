@@ -356,7 +356,7 @@ postgresql_max_standby_archive_delay: 30s # -1 allows indefinite delay
 # max delay before canceling queries when reading streaming WAL;
 postgresql_max_standby_streaming_delay: 30s # -1 allows indefinite delay
 # create temp slot if primary_slot_name is not set
-postgresql_wal_receiver_create_temp_slot: off      (>= 14)
+postgresql_wal_receiver_create_temp_slot: off      # (>= 14)
 # send replies at least this often
 postgresql_wal_receiver_status_interval: 10s # 0 disables
 # send info from standby to prevent query conflicts
