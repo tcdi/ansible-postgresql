@@ -803,3 +803,7 @@ include_dir = '{{ postgresql_include_dir }}'                    # include files 
 #------------------------------------------------------------------------------
 
 # Add settings for extensions here
+
+{% for postgresql_conf_extra_line in postgresql_conf_extra_lines %}
+{{ postgresql_conf_extra_line }}
+{% endfor %}

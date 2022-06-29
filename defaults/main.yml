@@ -836,3 +836,5 @@ postgresql_version_terse: "{{ postgresql_version | replace('.', '') }}"
 postgresql_apt_py3_dependencies: ["python3-psycopg2", "locales"]
 postgresql_apt_py2_dependencies: ["python-psycopg2", "python-pycurl", "locales"]
 postgresql_apt_dependencies: "{{ postgresql_apt_py3_dependencies if 'python3' in ansible_python_interpreter|default('') else postgresql_apt_py2_dependencies }}"
+
+postgresql_conf_extra_lines: []  # Added for pg14 template.  Use if exter plugin vars are needed. 
