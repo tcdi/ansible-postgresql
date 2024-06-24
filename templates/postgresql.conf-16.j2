@@ -332,7 +332,6 @@ synchronous_standby_names = '{% if postgresql_synchronous_standby_names != [] %}
 				# method to choose sync standbys, number of sync standbys,
 				# and comma-separated list of application_name
 				# from standby(s); '*' = all
-vacuum_defer_cleanup_age = {{ postgresql_vacuum_defer_cleanup_age }}	# number of xacts by which cleanup is delayed
 
 # - Standby Servers -
 
@@ -342,7 +341,6 @@ primary_conninfo = '{{ postgresql_primary_conninfo }}'                  # connec
                                         # (change requires restart)
 primary_slot_name = '{{ postgresql_primary_slot_name }}'                 # replication slot on sending server
                                         # (change requires restart)
-promote_trigger_file = '{{ postgresql_promote_trigger_file }}'              # file name whose presence ends recovery
 hot_standby = {{ 'on' if postgresql_hot_standby else 'off' }}			# "off" disallows queries during recovery
 					# (change requires restart)
 max_standby_archive_delay = {{ postgresql_max_standby_archive_delay }}	# max delay before canceling queries
@@ -625,8 +623,6 @@ track_io_timing = {{ 'on' if postgresql_track_io_timing else 'off' }}
 track_wal_io_timing = {{ 'on' if postgresql_track_wal_io_timing else 'off' }}
 track_functions = {{ postgresql_track_functions }}			# none, pl, all
 stats_fetch_consistency = {{ postgresql_stats_fetch_consistency }}	# cache, none, snapshot
-stats_temp_directory = '{{ postgresql_stats_temp_directory }}'
-
 
 # - Monitoring -
 
@@ -711,7 +707,7 @@ bytea_output = '{{ postgresql_bytea_output }}'			# hex, escape
 xmlbinary = '{{ postgresql_xmlbinary }}'
 xmloption = '{{ postgresql_xmloption }}'
 gin_pending_list_limit = {{ postgresql_gin_pending_list_limit }}
-createrole_self_grant = {{ postgresql_createrole_self_grant }}		# set and/or inherit
+createrole_self_grant = '{{ postgresql_createrole_self_grant }}'		# set and/or inherit
 
 # - Locale and Formatting -
 

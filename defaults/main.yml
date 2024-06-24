@@ -184,7 +184,7 @@ postgresql_dynamic_shared_memory_type: posix    # the default is the first optio
                                                 #   mmap
                                                 # use none to disable dynamic shared memory
 postgresql_min_dynamic_shared_memory: 0MB       # (>= 14)
-postgres_vacuum_buffer_usage_limit: 256kB       # (>= 16) size of vacuum and analyze buffer access strategy ring;
+postgresql_vacuum_buffer_usage_limit: 256kB       # (>= 16) size of vacuum and analyze buffer access strategy ring;
                                                 # 0 to disable vacuum buffer access strategy;
                                                 # range 128kB to 16GB
 
